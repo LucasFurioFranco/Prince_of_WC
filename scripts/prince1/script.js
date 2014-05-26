@@ -181,7 +181,7 @@ function Player(type, life, x, y){
 	this.state = 0;
 	this.direction = 1;	//-1 é esquerda e 1 é direita
 
-	this.height = 30;	//Altura do personagem
+	this.height = 15;	//Altura do personagem
 	this.width = 5;		//Largura do personagem
 
 	this.velX = 0;
@@ -253,99 +253,61 @@ p1.move = function(){
 	switch(this.state){
 		//Parado
 		case 0:
-			this.velX = 0;
-			if(!this.isOnGround){
-				this.anim[0].finalize();
+			if(!this.isOnGround){				//Se o personagem não está no chão, ele começa a cair. Esse if serve para o propósito de inserir pisos
+				this.anim[0].finalize();		//móveis ou que caiam com o peso do personagem
 				this.state = 5;	//Está caindo
 				break;
 			}
-			if(keyStatus[16]==1){
-				if(keyStatus[68]==1){	//d
-					if(this.direction == 1){
-						//Anda com cautela
-						//break;
-					}
-					else{
-						this.direction = 1;
-					}
-
-				}
-				if(keyStatus[65]==1){	//a
-					if(this.direction == -1){
-						//Anda com cautela
-						//break;
-					}
-					else{
-						this.direction = -1;
-					}
-				}
-
-				if(keyStatus[87]==1){	//w
-					this.anim[0].finalize();
-					this.anim[3].nframe = 0;
-					this.state = 3;
-				}
-
-				if(keyStatus[83]==1){
-				//Checa as condições de escalada
-				if(p1.isOnGround && !map.is_ground(this.x-15*this.direction, this.y-1) && !map.is_ground(this.x-15*this.direction, this.y+5)){
-					this.isGrabbing = true;
-					this.anim[0].finalize();
-					var difX = Math.min(Math.abs(this.x%50), Math.abs(50-this.x%50-1));
-					this.x-=this.direction*(difX + 8);
-					this.y+=42;
-					this.state = 8;
-					break;
-				}
-			}
-				break;
-			}
-			if(keyStatus[87] == 1){
-				if(keyStatus[68]==1){	//d
-					this.anim[0].finalize();
-					this.direction = 1;
-					this.anim[3].nframe = 0;
-					this.state = 3;
-					break;
-				}
-				if(keyStatus[65]==1){	//a
-					this.anim[0].finalize();
-					this.direction = -1;
-					this.anim[3].nframe = 0;
-					this.state = 3;
-					break;
-				}
-			}
+			this.velX = 0;						//Garante que o personagem fique parado
 			if(keyStatus[68]==1){	//d
-				this.velX = this.walkSpeed;
-				this.direction = 1;
-				this.anim[0].finalize();
-				this.state=1;
-				break;
-			}
-			if(keyStatus[65]==1){	//a
-				this.velX = -this.walkSpeed;
-				this.direction = -1;
-				this.anim[0].finalize();
-				this.state=1;
-				break;
-			}
-			//Escala a parede se estiver perto dela e ela for baixa o suficiente (case 7 não invertido)
-			if(keyStatus[87]==1){
-				//Checa as condições de escalada
-				if(map.is_ground(this.x+10*this.direction, this.y-1) && !map.is_ground(this.x+10*this.direction, this.y-51)){
-					this.isGrabbing = true;
-					this.anim[0].finalize();
-					this.state = 7;
-					this.anim[7].nframe = 0;
-					this.x-=this.direction;
+				if(this.direction == -1){
+					//Vira para o outro lado
+					this.direction = 1;
 					break;
 				}
+				else{
+					if(keyStatus[16]==1){
+						//O personagem corre
+						break;
+					}
+					else{
+						//O personagem anda
+						this.anim[0].finalize();
+						this.state=1;
+						this.anim[1].nframe=0;
+						this.velX = this.walkSpeed;
+						break;
+					}
+				}
 			}
-
+			else if(keyStatus[65]==1){	//a
+				if(this.direction == 1){
+					//Vira para o outro lado
+					this.direction = -1;
+				}
+				else{
+					if(keyStatus[16]==1){
+						//O personagem corre
+						break;
+					}
+					else{
+						//O personagem anda
+						this.anim[0].finalize();
+						this.state=1;
+						this.anim[1].nframe=0;
+						this.velX = -this.walkSpeed;
+						break;
+					}
+				}
+			}
+			//Salta
+			if(keyStatus[87]==1){	//w
+				this.anim[0].finalize();
+				this.anim[3].nframe = 0;
+				this.state = 3;
+			}
 			//Desce pela parede se estiver perto dela e ela estiver atras do personagem(case 7 invertido)
-			if(keyStatus[83]==1){
-				//Checa as condições de escalada
+			if(keyStatus[83]==1){	//Checa as condições de escalada
 				if(p1.isOnGround && !map.is_ground(this.x-15*this.direction, this.y-1) && !map.is_ground(this.x-15*this.direction, this.y+5)){
 					this.isGrabbing = true;
 					this.anim[0].finalize();
@@ -356,7 +318,6 @@ p1.move = function(){
 					break;
 				}
 			}
-
 		break;
 		
 		//Andando
