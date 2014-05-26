@@ -11,7 +11,7 @@ var flag_following_camera = true;
 
 var grav = 1;
 
-var dist_pegavel = 13;
+var dist_pegavel = 12;
 	
 var map;
 var p1;
@@ -25,7 +25,8 @@ function init(){
 	}
 
 	init_map(10, 10);
-	p1 = new Player("wc", 100, 740, 99);
+	//p1 = new Player("wc", 100, 740, 99);
+	p1 = new Player("wc", 100, 890	, 300);
 	p1.direction = -1;
 	p1.state = 0;
 
@@ -202,9 +203,15 @@ function Player(type, life, x, y){
 	this.anim[6] = new Animation("caindo1", 'scripts/prince1/sprites/'+this.type+'/pulando2.png', 25-14, 64, 14);	//Fim de queda média
 	this.anim[7] = new Animation("escalando1", 'scripts/prince1/sprites/'+this.type+'/escalando_parado.png', 24, 64, 0);	//Escalando parado
 	this.anim[8] = new Animation("segurando_parede", 'scripts/prince1/sprites/'+this.type+'/segurando_parede.png', 1, 64, 0);	//Pendurando na parede
+	this.anim[9] = new Animation("subindo_descendo_parede", 'scripts/prince1/sprites/'+this.type+'/escalando_parado.png', 24, 64, 0);	//Pendurando na parede
 }
 Player.prototype.move = function(){
 
+}
+Player.prototype.change_state = function(s, isInverted){
+	this.anim[this.state].finalize();
+	this.state = s;
+	this.anim[s].start(isInverted);
 }
 p1.move = function(){
 	//DEBUG INFO
@@ -212,7 +219,7 @@ p1.move = function(){
 	ctxInfo.fillText(this.type + " life: " + this.life, 15, 15); //INFO
 	ctxInfo.fillText("Position: (" + this.x + "  ,  " + this.y + ")", 15, 30); //INFO
 	ctxInfo.fillText("Estado atual: " + this.state, 15, 45); //INFO
-	ctxInfo.fillText(this.type + " isOnGround: " + this.isOnGround, 15, 60); //INFO
+	ctxInfo.fillText(this.type + " isOnGround: " + this.isOnGround + "       isGrabbing: " + this.isGrabbing, 15, 60); //INFO
 	ctxInfo.fillText("distancia:  " + dist_points(400, 150+33, this.x, this.y), 15, 105); //INFO
 
 	if(!this.anim[this.state].isStarted){
@@ -300,22 +307,36 @@ p1.move = function(){
 					}
 				}
 			}
-			//Salta
+			//Salta ou escala
 			if(keyStatus[87]==1){	//w
-				this.anim[0].finalize();
-				this.anim[3].nframe = 0;
-				this.state = 3;
+				if(map.is_ground(this.x+dist_pegavel*this.direction, this.y-5) && !map.is_ground(this.x+dist_pegavel*this.direction, this.y-55)){
+					var difY = Math.abs(this.y%50);
+					if(difY>25){
+						difY = Math.abs(difY-50);
+					}
+					if(difY-50 < dist_pegavel){
+						this.isGrabbing = true;
+						this.change_state(7, false);
+						break;
+					}
+				}
+				else{
+					this.change_state(3, false);
+					break;
+				}
 			}
 			//Desce pela parede se estiver perto dela e ela estiver atras do personagem(case 7 invertido)
 			if(keyStatus[83]==1){	//Checa as condições de escalada
-				if(p1.isOnGround && !map.is_ground(this.x-15*this.direction, this.y-1) && !map.is_ground(this.x-15*this.direction, this.y+5)){
-					this.isGrabbing = true;
-					this.anim[0].finalize();
-					var difX = Math.min(Math.abs(this.x%50), Math.abs(50-this.x%50-1));
-					this.x-=this.direction*(difX + 8);
-					this.y+=42;
-					this.state = 8;
-					break;
+				if(this.isOnGround && !map.is_ground(this.x-dist_pegavel*this.direction, this.y-25) && !map.is_ground(this.x-dist_pegavel*this.direction, this.y+25)){
+					var difY = Math.abs(this.y%50);
+					if(difY>25){
+						difY = Math.abs(difY-50);
+					}
+					if(difY < dist_pegavel){
+						this.isGrabbing = true;
+						this.change_state(9, true);
+						break;
+					}
 				}
 			}
 		break;
@@ -470,28 +491,23 @@ p1.move = function(){
 			if(this.anim[7].isFinished){
 				if(this.anim[7].isInvert){
 					this.isGrabbing = false;
-					if(map.is_ground(this.x, this.y+32)){
-						this.state = 0;
+					if(map.is_ground(this.x, this.y+50)){
+						this.change_state(0, false);
 					}
 					else{
-						this.state = 5;
+						this.change_state(5, false);
 					}
-					this.anim[7].finalize();
 					break;
 				}
 				else{
-					this.state = 8;
-					this.anim[7].finalize();
+					this.change_state(8, false);
 					break
 				}
 				break;
 			}
-			if(this.anim[7].nframe >= 10 && this.anim[7].nframe<=18){
+			if(this.anim[7].nframe >= 10 && this.anim[7].nframe<=16){
 				if(!this.anim[7].isInvert){
 					this.y-=0.3;
-					if(this.anim[7].nframe == 12){
-						this.y-=2;
-					}
 				}
 				break;
 			}
@@ -518,28 +534,55 @@ p1.move = function(){
 		case 8:
 			this.velX = 0;
 			this.velY = 0;
+			var difY = this.y%50-50;
+			var difX = Math.min(Math.abs(this.x%50), Math.abs(50-this.x%50));
+			this.x+=this.direction*(difX - 8);
+
 			//Se o player pressionar 's', o personagem vai largar a parede e começar a cair
 			if(keyStatus[87] == 1){	//w
-				this.state = 0;
-				this.x+=15*this.direction;
-				this.y-=55;
-				this.isGrabbing = false;
+				this.change_state(9, false);
 				break;
 			}
-			if(keyStatus[16] == 0){	//s
-				this.state = 7;
-				this.isGrabbing = false;
-				this.anim[7].start(true);
+			if(keyStatus[16] == 0){	//solta o shift
+				this.isGrabbing=false;
+				this.change_state(7, true);
 				break;
 			}
+
 		break;
 
-		//Pulando contrário à parede (virando e chutando a parede)
+		//Subindo/descendo a parede
 		case 9:
+			var d = -1;
+			if(!this.anim[9].isInvert){
+				if(this.anim[9].isFinished){
+					this.isGrabbing = false;
+					this.change_state(0, false);
+					break;
+				}
+				d = 1;
+			}
+			if(this.anim[9].isFinished){
+				this.isGrabbing = true;
+				this.change_state(8, false);
+				break;
+			}
+			if(this.anim[9].nframe>4 && this.anim[9].nframe<=14){	//Está subindo
+				this.y-=4.5*d;
+				break;
+			}
+			if(this.anim[9].nframe>14 && this.anim[9].nframe<this.anim[9].totalFrames-1){
+				this.x+=2*this.direction*d;
+				break;
+			}
+		break;		
+
+		//Pulando contrário à parede (virando e chutando a parede)
+		case 10:
 		break;
 
 		//Fim de queda muito alta (rolamento)
-		case 10:
+		case 11:
 		break;
 
 
