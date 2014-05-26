@@ -1,6 +1,6 @@
 var c = document.getElementById('canvasPrince1');	//Armazena as informações do canvas, como largura e altura
 var ctx = c.getContext("2d");
-var keyStatus = [];
+var keyStatus = [];		//Status de todas as teclas para checagem caso elas estejam pressionadas ou não
 
 var cInfo = document.getElementById('canvasPrince1Info');	//Armazena as informações do canvas, como largura e altura
 var ctxInfo = cInfo.getContext("2d");
