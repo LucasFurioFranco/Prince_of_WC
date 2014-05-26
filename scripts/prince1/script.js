@@ -70,52 +70,58 @@ function init_map(width, height){
 	map.blocks[6].boundingBox[0] = [0, 50, 100, 100];
 
 	//cria a arena
+	var l = 0;
+
 	//Linha 0
 	map.arena[9][0] = 5;
 
 	//Linha 1
-	map.arena[0][1] = 1;
-	map.arena[1][1] = 2;
-	map.arena[2][1] = 6;
-	map.arena[4][1] = 2;
-	map.arena[5][1] = 1;
-	map.arena[7][1] = 1;
-	map.arena[8][1] = 3;
-	map.arena[9][1] = 2;
+	l = 1;
+	map.arena[0][l] = 1;
+	map.arena[1][l] = 2;
+	map.arena[2][l] = 6;
+	map.arena[4][l] = 2;
+	map.arena[5][l] = 1;
+	map.arena[7][l] = 1;
+	map.arena[8][l] = 3;
+	map.arena[9][l] = 2;
 
 	//Linha 2
-	map.arena[3][2] = 4;
-	map.arena[2][2] = 6;
-	map.arena[4][2] = 3;
-	map.arena[5][2] = 4;
-	map.arena[6][2] = 3;
-	map.arena[7][2] = 5;
-	map.arena[8][2] = 3;
-	map.arena[9][2] = 2;
+	l = 2;
+	map.arena[3][l] = 4;
+	map.arena[2][l] = 6;
+	map.arena[4][l] = 3;
+	map.arena[5][l] = 4;
+	map.arena[6][l] = 3;
+	map.arena[7][l] = 5;
+	map.arena[8][l] = 3;
+	map.arena[9][l] = 2;
 
 	//Linha 3
-	map.arena[0][3] = 1;
-	map.arena[1][3] = 1;
-	map.arena[2][3] = 1;
-	map.arena[3][3] = 1;
-	map.arena[4][3] = 1;
-	map.arena[5][3] = 4;
-	map.arena[6][3] = 3;
-	map.arena[7][3] = 0;
-	map.arena[8][3] = 2;
-	map.arena[9][3] = 1;
+	l = 3;
+	map.arena[0][l] = 1;
+	map.arena[1][l] = 1;
+	map.arena[2][l] = 1;
+	map.arena[3][l] = 1;
+	map.arena[4][l] = 1;
+	map.arena[5][l] = 4;
+	map.arena[6][l] = 3;
+	map.arena[7][l] = 0;
+	map.arena[8][l] = 2;
+	map.arena[9][l] = 1;
 
 	//Linha 4
-	map.arena[0][4] = 1;
-	map.arena[1][4] = 1;
-	map.arena[2][4] = 1;
-	map.arena[3][4] = 1;
-	map.arena[4][4] = 1;
-	map.arena[5][4] = 1;
-	map.arena[6][4] = 1;
-	map.arena[7][4] = 1;
-	map.arena[8][4] = 1;
-	map.arena[9][4] = 1;
+	l = 4;
+	map.arena[0][l] = 1;
+	map.arena[1][l] = 1;
+	map.arena[2][l] = 1;
+	map.arena[3][l] = 1;
+	map.arena[4][l] = 1;
+	map.arena[5][l] = 1;
+	map.arena[6][l] = 1;
+	map.arena[7][l] = 1;
+	map.arena[8][l] = 1;
+	map.arena[9][l] = 1;
 }
 
 function Map(width, height){
@@ -175,8 +181,8 @@ function Player(type, life, x, y){
 	this.state = 0;
 	this.direction = 1;	//-1 é esquerda e 1 é direita
 
-	this.height = 15;
-	this.width = 5;
+	this.height = 30;	//Altura do personagem
+	this.width = 5;		//Largura do personagem
 
 	this.velX = 0;
 	this.velY = 0;
@@ -276,6 +282,7 @@ p1.move = function(){
 
 				if(keyStatus[87]==1){	//w
 					this.anim[0].finalize();
+					this.anim[3].nframe = 0;
 					this.state = 3;
 				}
 
@@ -297,12 +304,14 @@ p1.move = function(){
 				if(keyStatus[68]==1){	//d
 					this.anim[0].finalize();
 					this.direction = 1;
+					this.anim[3].nframe = 0;
 					this.state = 3;
 					break;
 				}
 				if(keyStatus[65]==1){	//a
 					this.anim[0].finalize();
 					this.direction = -1;
+					this.anim[3].nframe = 0;
 					this.state = 3;
 					break;
 				}
@@ -360,6 +369,7 @@ p1.move = function(){
 			if(this.anim[1].nframe == 10 || this.anim[1].isFinished){
 				if(keyStatus[87]==1){	//w
 					this.anim[1].finalize();
+					this.anim[3].nframe = 0;
 					this.state = 3;
 					break;
 				}
@@ -457,7 +467,12 @@ p1.move = function(){
 					//Pula para queda alta
 					break;
 				}
+				else if(velYAnt>10){
+					this.state = 6;
+					break;
+				}
 				this.state = 0;
+				break;
 			}
 			//Se não estiver caindo muito rápido, o jogador pode se agarrar a uma parede
 			if(this.velY <= 16){
@@ -571,9 +586,11 @@ p1.move = function(){
 			alert("p1.function error --- non-existant state");
 		break;
 
+		/*
 		if(!this.anim[this.state].isStarted){
 			this.anim[this.state].start(false);
 		}
+		*/
 	}
 }
 
@@ -750,4 +767,5 @@ p1.draw = function(){
 Animation.prototype.draw = function(){
 	ctx.drawImage(this.img, (this.sprStart+this.nframe)*this.frameSize, 0, this.frameSize, this.frameSize, 0, 0, 64, 64);
 }
+
 
