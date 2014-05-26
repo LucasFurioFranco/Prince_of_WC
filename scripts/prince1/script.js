@@ -26,7 +26,7 @@ function init(){
 
 	init_map(10, 10);
 	//p1 = new Player("wc", 100, 740, 99);
-	p1 = new Player("wc", 100, 890	, 300);
+	p1 = new Player("wc", 100, 770	, 100);
 	p1.direction = -1;
 	p1.state = 0;
 
@@ -775,5 +775,3 @@ p1.draw = function(){
 Animation.prototype.draw = function(){
 	ctx.drawImage(this.img, (this.sprStart+this.nframe)*this.frameSize, 0, this.frameSize, this.frameSize, 0, 0, 64, 64);
 }
-
-
