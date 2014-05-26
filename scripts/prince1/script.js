@@ -581,8 +581,12 @@ p1.move = function(){
 		case 10:
 		break;
 
-		//Fim de queda muito alta (rolamento)
+		//Fim de queda muito alta (esburrachamento, velX muito baixa)
 		case 11:
+		break;
+
+		//Fim de queda muito alta (rolamento, velX suficiente para rolamento)
+		case 12:
 		break;
 
 
