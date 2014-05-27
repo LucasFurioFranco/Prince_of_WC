@@ -26,13 +26,13 @@ function init(){
 
 	init_map(10, 10);
 	//p1 = new Player("wc", 100, 740, 99);
-	p1 = new Player("wc", 100, 770	, 100);
+	p1 = new Player("wc", 100, 205	, 150);
 	p1.direction = -1;
 	p1.state = 0;
 
 	map.players.push(p1);
-	map.players.push(new Player("skeleton", 100, 474, 99));
-	map.players.push(new Player("arabic_guard_1", 100, 320, 300));
+	//map.players.push(new Player("skeleton", 100, 474, 99));
+	//map.players.push(new Player("arabic_guard_1", 100, 320, 300));
 
 	setInterval(draw, 50);
 }
@@ -203,7 +203,7 @@ function Player(type, life, x, y){
 	this.anim[6] = new Animation("caindo1", 'scripts/prince1/sprites/'+this.type+'/pulando2.png', 25-14, 64, 14);	//Fim de queda média
 	this.anim[7] = new Animation("escalando1", 'scripts/prince1/sprites/'+this.type+'/escalando_parado.png', 24, 64, 0);	//Escalando parado
 	this.anim[8] = new Animation("segurando_parede", 'scripts/prince1/sprites/'+this.type+'/segurando_parede.png', 1, 64, 0);	//Pendurando na parede
-	this.anim[9] = new Animation("subindo_descendo_parede", 'scripts/prince1/sprites/'+this.type+'/escalando_parado.png', 24, 64, 0);	//Pendurando na parede
+	this.anim[9] = new Animation("subindo_descendo_parede", 'scripts/prince1/sprites/'+this.type+'/subindo_descendo.png', 24, 64, 0);	//Pendurando na parede
 }
 Player.prototype.move = function(){
 
@@ -560,21 +560,27 @@ p1.move = function(){
 					this.change_state(0, false);
 					break;
 				}
-				d = 1;
+				if(this.anim[9].nframe <= 1){
+					this.y-=20;
+					this.x+=10*this.direction;
+					break;
+				}
+			}
+			else{
+
+				if(this.anim[9].nframe==this.anim[9].totalFrames-2){
+					this.y+=24;
+					this.x-=10*this.direction;
+					break;
+				}
+
 			}
 			if(this.anim[9].isFinished){
 				this.isGrabbing = true;
 				this.change_state(8, false);
 				break;
 			}
-			if(this.anim[9].nframe>4 && this.anim[9].nframe<=14){	//Está subindo
-				this.y-=4.5*d;
-				break;
-			}
-			if(this.anim[9].nframe>14 && this.anim[9].nframe<this.anim[9].totalFrames-1){
-				this.x+=2*this.direction*d;
-				break;
-			}
+
 		break;		
 
 		//Pulando contrário à parede (virando e chutando a parede)
