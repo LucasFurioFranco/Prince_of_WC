@@ -203,7 +203,7 @@ function Player(type, life, x, y){
 	this.anim[6] = new Animation("caindo1", 'scripts/prince1/sprites/'+this.type+'/pulando2.png', 25-14, 64, 14);	//Fim de queda média
 	this.anim[7] = new Animation("escalando1", 'scripts/prince1/sprites/'+this.type+'/escalando_parado.png', 24, 64, 0);	//Escalando parado
 	this.anim[8] = new Animation("segurando_parede", 'scripts/prince1/sprites/'+this.type+'/segurando_parede.png', 1, 64, 0);	//Pendurando na parede
-	this.anim[9] = new Animation("subindo_descendo_parede", 'scripts/prince1/sprites/'+this.type+'/subindo_descendo.png', 24, 64, 0);	//Pendurando na parede
+	this.anim[9] = new Animation("subindo_descendo_parede", 'scripts/prince1/sprites/'+this.type+'/subindo_descendo.png', 33, 64, 0);	//Pendurando na parede
 }
 Player.prototype.move = function(){
 
@@ -309,7 +309,7 @@ p1.move = function(){
 			}
 			//Salta ou escala
 			if(keyStatus[87]==1){	//w
-				if(map.is_ground(this.x+dist_pegavel*this.direction, this.y-5) && !map.is_ground(this.x+dist_pegavel*this.direction, this.y-55)){
+				if(map.is_ground(this.x+dist_pegavel*this.direction, this.y-15) && !map.is_ground(this.x+dist_pegavel*this.direction, this.y-65)){
 					var difY = Math.abs(this.y%50);
 					if(difY>25){
 						difY = Math.abs(difY-50);
@@ -570,7 +570,6 @@ p1.move = function(){
 
 				if(this.anim[9].nframe==this.anim[9].totalFrames-2){
 					this.y+=24;
-					this.x-=10*this.direction;
 					break;
 				}
 
@@ -578,6 +577,8 @@ p1.move = function(){
 			if(this.anim[9].isFinished){
 				this.isGrabbing = true;
 				this.change_state(8, false);
+				this.x-=10*this.direction;
+				this.y+=24;
 				break;
 			}
 
