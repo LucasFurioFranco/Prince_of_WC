@@ -1,1 +1,1 @@
-scalate for 0.875
+scalate for 0.675
