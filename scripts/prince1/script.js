@@ -557,7 +557,7 @@ p1.move = function(){
 			if(!this.anim[9].isInvert){
 				if(this.anim[9].isFinished){
 					this.isGrabbing = false;
-	this.x += 10*this.direction;//Gambiarra momentanea
+	this.x += 15*this.direction;//Gambiarra momentanea
 	this.y -= 30;
 					this.change_state(0, false);
 					break;
@@ -565,6 +565,7 @@ p1.move = function(){
 				if(this.anim[9].nframe <= 7){
 					if(this.anim[9].nframe <= 1){
 						this.y-=4;
+						this.x-=this.direction*3;
 					}
 					this.y-=1.6;
 					break;
